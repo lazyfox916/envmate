@@ -214,7 +214,9 @@ export const validateBody = (schema: ZodSchema) => {
 export const validateQuery = (schema: ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
-      req.query = schema.parse(req.query) as any;
+      const parsed = schema.parse(req.query) as any;
+      // Don't overwrite req.query (may be getter-only). Attach parsed values to req.parsedQuery
+      (req as any).parsedQuery = parsed;
       next();
     } catch (error) {
       if (error instanceof ZodError) {
@@ -225,7 +227,9 @@ export const validateQuery = (schema: ZodSchema) => {
         res.status(400).json(errorResponse('Invalid query parameters', undefined, errors));
         return;
       }
-      res.status(400).json(errorResponse('Invalid query parameters'));
+      console.error('Query validation error:', error);
+      const errMsg = error && (error as Error).message ? (error as Error).message : 'Invalid query parameters';
+      res.status(400).json(errorResponse('Invalid query parameters', undefined, [{ field: '', message: errMsg }]));
     }
   };
 };

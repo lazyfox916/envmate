@@ -94,10 +94,7 @@ app.use('/api/v1/invitations', invitationRoutes);
 // Team invitation routes (nested under teams)
 app.use('/api/v1/teams/:teamId/invitations', teamInvitationRouter);
 
-// Project routes (handles both /teams/:teamId/projects and /projects/:projectId)
-app.use('/api/v1', projectRoutes);
-
-// Health check endpoint (v1)
+// Health check endpoint (v1) - register before project routes so it's public
 app.get('/api/v1/health', (_req: Request, res: Response) => {
   sendSuccess(res, {
     status: 'healthy',
@@ -105,6 +102,9 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
     version: '1.0.0',
   });
 });
+
+// Project routes (handles both /teams/:teamId/projects and /projects/:projectId)
+app.use('/api/v1', projectRoutes);
 
 // Legacy health check (for backwards compatibility)
 app.get('/api/health', (_req: Request, res: Response) => {

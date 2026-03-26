@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { register, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -28,7 +29,8 @@ export default function RegisterPage() {
   }
 
   if (isAuthenticated) {
-    router.push('/dashboard');
+    const next = searchParams.get('next');
+    router.push(next || '/dashboard');
     return null;
   }
 
@@ -64,7 +66,8 @@ export default function RegisterPage() {
     try {
       const result = await register(formData.email, formData.password, formData.name);
       if (result.success) {
-        router.push('/dashboard');
+        const next = searchParams.get('next');
+        router.push(next || '/dashboard');
       } else {
         setError(result.error || 'Registration failed');
       }

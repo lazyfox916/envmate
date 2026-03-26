@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -26,7 +27,8 @@ export default function LoginPage() {
   }
 
   if (isAuthenticated) {
-    router.push('/dashboard');
+    const next = searchParams.get('next');
+    router.push(next || '/dashboard');
     return null;
   }
 
@@ -38,7 +40,8 @@ export default function LoginPage() {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
-        router.push('/dashboard');
+        const next = searchParams.get('next');
+        router.push(next || '/dashboard');
       } else {
         setError(result.error || 'Login failed');
       }

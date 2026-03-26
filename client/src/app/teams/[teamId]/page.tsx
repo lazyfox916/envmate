@@ -21,10 +21,12 @@ export default function TeamDetailPage() {
     removeMember,
     updateMemberRole,
     setCurrentTeam,
+    inviteMember,
   } = useTeam();
 
   const [team, setTeam] = useState<Team | null>(null);
   const [members, setMembers] = useState<TeamMember[]>([]);
+  const [invitations, setInvitations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -38,6 +40,13 @@ export default function TeamDetailPage() {
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Invite modal state
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('viewer');
+  const [inviteError, setInviteError] = useState('');
+  const [isInviting, setIsInviting] = useState(false);
 
   // Role change state
   const [changingRoleFor, setChangingRoleFor] = useState<string | null>(null);
@@ -66,6 +75,13 @@ export default function TeamDetailPage() {
 
       if (membersResult.success && membersResult.members) {
         setMembers(membersResult.members);
+      }
+      // Try to load invitations (admins only)
+      const invResult = await getTeamInvitations(teamId);
+      if (invResult.success && invResult.invitations) {
+        setInvitations(invResult.invitations);
+      } else {
+        setInvitations([]);
       }
     } catch {
       setError('Failed to load team data');
@@ -105,6 +121,12 @@ export default function TeamDetailPage() {
 
     if (membersResult.success && membersResult.members) {
       setMembers(membersResult.members);
+    }
+    const invResult = await getTeamInvitations(teamId);
+    if (invResult.success && invResult.invitations) {
+      setInvitations(invResult.invitations);
+    } else {
+      setInvitations([]);
     }
   };
 
@@ -171,6 +193,43 @@ export default function TeamDetailPage() {
     setChangingRoleFor(null);
   };
 
+  const handleInviteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInviteError('');
+    setIsInviting(true);
+
+    const result = await inviteMember(teamId, inviteEmail, inviteRole);
+    if (result.success) {
+      setShowInviteModal(false);
+      setInviteEmail('');
+      setInviteRole('viewer');
+      await refreshTeamData();
+    } else {
+      setInviteError(result.error || 'Failed to send invitation');
+    }
+
+    setIsInviting(false);
+  };
+
+  const handleRevokeInvitation = async (invId: string) => {
+    if (!confirm('Revoke this invitation?')) return;
+    const result = await revokeInvitation(teamId, invId);
+    if (result.success) {
+      await refreshTeamData();
+    } else {
+      setError(result.error || 'Failed to revoke invitation');
+    }
+  };
+
+  const handleResendInvitation = async (invId: string) => {
+    const result = await resendInvitation(teamId, invId);
+    if (result.success) {
+      await refreshTeamData();
+    } else {
+      setError(result.error || 'Failed to resend invitation');
+    }
+  };
+
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -209,6 +268,12 @@ export default function TeamDetailPage() {
                   className="px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
                 >
                   Settings
+                </button>
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="px-3 py-2 text-sm text-white bg-green-600 rounded-md hover:bg-green-700"
+                >
+                  Invite
                 </button>
               </div>
             )}
@@ -334,6 +399,31 @@ export default function TeamDetailPage() {
               ))}
             </ul>
           </div>
+
+          {isAdmin && (
+            <div className="bg-white rounded-lg shadow mt-6">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-medium text-gray-900">Pending Invitations</h2>
+              </div>
+              <ul className="divide-y divide-gray-200">
+                {invitations.length === 0 && (
+                  <li className="px-6 py-4 text-sm text-gray-500">No pending invitations</li>
+                )}
+                {invitations.map((inv) => (
+                  <li key={inv.id} className="px-6 py-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{inv.email}</p>
+                      <p className="text-sm text-gray-500">Role: {inv.role} · Expires: {new Date(inv.expiresAt || inv.expires_at).toLocaleString()}</p>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <button onClick={() => handleResendInvitation(inv.id)} className="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md">Resend</button>
+                      <button onClick={() => handleRevokeInvitation(inv.id)} className="px-3 py-1 text-sm text-red-600">Revoke</button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </main>
 
@@ -392,6 +482,66 @@ export default function TeamDetailPage() {
                     className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
                   >
                     {isSaving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Invite Member Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-gray-500 bg-opacity-75"
+              onClick={() => setShowInviteModal(false)}
+            />
+            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Invite Member</h2>
+              <form onSubmit={handleInviteSubmit}>
+                {inviteError && (
+                  <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                    {inviteError}
+                  </div>
+                )}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700">Role</label>
+                  <select
+                    value={inviteRole}
+                    onChange={(e) => setInviteRole(e.target.value)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2"
+                  >
+                    <option value="viewer">Viewer</option>
+                    <option value="editor">Editor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowInviteModal(false)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isInviting}
+                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50"
+                  >
+                    {isInviting ? 'Inviting...' : 'Send Invitation'}
                   </button>
                 </div>
               </form>

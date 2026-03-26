@@ -72,7 +72,9 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const { teamId } = req.params;
-      const result = await ProjectService.listByTeam(teamId as string, req.query as any);
+      // Use parsed query from validation middleware if available
+      const queryParams = (req as any).parsedQuery ?? req.query;
+      const result = await ProjectService.listByTeam(teamId as string, queryParams as any);
 
       res.json(successResponse(result));
     } catch (error) {

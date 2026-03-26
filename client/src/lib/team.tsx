@@ -54,6 +54,10 @@ interface TeamContextType extends TeamState {
   getTeamMembers: (teamId: string) => Promise<{ success: boolean; members?: TeamMember[]; error?: string }>;
   removeMember: (teamId: string, userId: string) => Promise<{ success: boolean; error?: string }>;
   updateMemberRole: (teamId: string, userId: string, role: string) => Promise<{ success: boolean; error?: string }>;
+  inviteMember: (teamId: string, email: string, role?: string) => Promise<{ success: boolean; error?: string }>;
+  getTeamInvitations: (teamId: string) => Promise<{ success: boolean; invitations?: any[]; error?: string }>;
+  revokeInvitation: (teamId: string, invitationId: string) => Promise<{ success: boolean; error?: string }>;
+  resendInvitation: (teamId: string, invitationId: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const TeamContext = createContext<TeamContextType | undefined>(undefined);
@@ -278,6 +282,88 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   /**
+   * Invite a user to the team (admins only)
+   */
+  const inviteMember = useCallback(async (teamId: string, email: string, role: string = 'viewer') => {
+    try {
+      const response = await authFetch(`${API_URL}/api/v1/teams/${teamId}/invitations`, {
+        method: 'POST',
+        body: JSON.stringify({ email, role }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        return { success: true };
+      }
+
+      return { success: false, error: data.error || 'Failed to send invitation' };
+    } catch {
+      return { success: false, error: 'Network error' };
+    }
+  }, []);
+
+  /**
+   * Get pending invitations for a team (admins only)
+   */
+  const getTeamInvitations = useCallback(async (teamId: string) => {
+    try {
+      const response = await authFetch(`${API_URL}/api/v1/teams/${teamId}/invitations`);
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        return { success: true, invitations: data.data };
+      }
+
+      return { success: false, error: data.error || 'Failed to get invitations' };
+    } catch {
+      return { success: false, error: 'Network error' };
+    }
+  }, []);
+
+  /**
+   * Revoke a pending invitation
+   */
+  const revokeInvitation = useCallback(async (teamId: string, invitationId: string) => {
+    try {
+      const response = await authFetch(`${API_URL}/api/v1/teams/${teamId}/invitations/${invitationId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        return { success: true };
+      }
+
+      return { success: false, error: data.error || 'Failed to revoke invitation' };
+    } catch {
+      return { success: false, error: 'Network error' };
+    }
+  }, []);
+
+  /**
+   * Resend invitation email
+   */
+  const resendInvitation = useCallback(async (teamId: string, invitationId: string) => {
+    try {
+      const response = await authFetch(`${API_URL}/api/v1/teams/${teamId}/invitations/${invitationId}/resend`, {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        return { success: true };
+      }
+
+      return { success: false, error: data.error || 'Failed to resend invitation' };
+    } catch {
+      return { success: false, error: 'Network error' };
+    }
+  }, []);
+
+  /**
    * Remove member from team
    */
   const removeMember = useCallback(async (teamId: string, userId: string) => {
@@ -334,6 +420,10 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         getTeamMembers,
         removeMember,
         updateMemberRole,
+        inviteMember,
+        getTeamInvitations,
+        revokeInvitation,
+        resendInvitation,
       }}
     >
       {children}

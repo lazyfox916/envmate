@@ -233,6 +233,30 @@ export default function ProjectDetailPage() {
     }
   };
 
+  const copyEnvToClipboard = async () => {
+    try {
+      let content = '';
+
+      if (envData && envData.variables && envData.variables.length > 0) {
+        content = envData.variables.map((v) => `${v.key}=${v.value}`).join('\n');
+      } else {
+        const res = await exportEnvFile(projectId);
+        if (res.success && res.content) content = res.content;
+        else {
+          setError(res.error || 'Failed to get env content');
+          return;
+        }
+      }
+
+      await navigator.clipboard.writeText(content);
+      setError('Copied .env to clipboard');
+      setTimeout(() => setError(''), 1800);
+    } catch (err) {
+      setError('Failed to copy .env');
+      console.error(err);
+    }
+  };
+
   const fetchDecryptedValue = async (key: string) => {
     // Check if already decrypted
     if (decryptedValues.has(key)) {
@@ -379,12 +403,20 @@ export default function ProjectDetailPage() {
                   Upload .env
                 </button>
                 {variables.length > 0 && (
-                  <button
-                    onClick={handleExport}
-                    className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-                  >
-                    Export
-                  </button>
+                  <>
+                    <button
+                      onClick={handleExport}
+                      className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                    >
+                      Export
+                    </button>
+                    <button
+                      onClick={copyEnvToClipboard}
+                      className="px-3 py-2 ml-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                    >
+                      Copy .env
+                    </button>
+                  </>
                 )}
               </div>
             </div>
