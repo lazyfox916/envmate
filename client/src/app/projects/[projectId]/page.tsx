@@ -43,6 +43,7 @@ export default function ProjectDetailPage() {
 
   // Upload modal state
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadMode, setUploadMode] = useState<'upload' | 'update'>('upload');
   const [uploadContent, setUploadContent] = useState('');
   const [uploadOverwrite, setUploadOverwrite] = useState(false);
   const [uploadError, setUploadError] = useState('');
@@ -59,6 +60,9 @@ export default function ProjectDetailPage() {
   const [revealedKeys, setRevealedKeys] = useState<Set<string>>(new Set());
   const [decryptedValues, setDecryptedValues] = useState<Map<string, string>>(new Map());
   const [decryptingKey, setDecryptingKey] = useState<string | null>(null);
+
+  // Success message state
+  const [success, setSuccess] = useState('');
 
   // File input ref
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -249,8 +253,8 @@ export default function ProjectDetailPage() {
       }
 
       await navigator.clipboard.writeText(content);
-      setError('Copied .env to clipboard');
-      setTimeout(() => setError(''), 1800);
+      setSuccess('Copied .env to clipboard');
+      setTimeout(() => setSuccess(''), 1800);
     } catch (err) {
       setError('Failed to copy .env');
       console.error(err);
@@ -324,8 +328,8 @@ export default function ProjectDetailPage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="text-slate-400">Loading...</div>
       </div>
     );
   }
@@ -337,32 +341,32 @@ export default function ProjectDetailPage() {
   const variables = envData?.variables || [];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <nav className="bg-slate-800/95 border-b border-slate-700 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link href="/dashboard" className="text-xl font-bold text-gray-900">
+              <Link href="/dashboard" className="text-xl font-bold text-white">
                 EnvMate
               </Link>
-              <span className="ml-4 text-gray-500">/</span>
-              <Link href="/teams" className="ml-4 text-gray-700 hover:text-gray-900">
+              <span className="ml-4 text-slate-500">/</span>
+              <Link href="/teams" className="ml-4 text-slate-300 hover:text-white">
                 Teams
               </Link>
-              <span className="ml-4 text-gray-500">/</span>
+              <span className="ml-4 text-slate-500">/</span>
               <Link
                 href={`/teams/${project.team_id}/projects`}
-                className="ml-4 text-gray-700 hover:text-gray-900"
+                className="ml-4 text-slate-300 hover:text-white"
               >
                 {project.team?.name || 'Team'}
               </Link>
-              <span className="ml-4 text-gray-500">/</span>
-              <span className="ml-4 text-gray-900">{project.name}</span>
+              <span className="ml-4 text-slate-500">/</span>
+              <span className="ml-4 text-white">{project.name}</span>
             </div>
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setShowEditModal(true)}
-                className="px-3 py-2 text-sm text-gray-700 hover:text-gray-900"
+                className="px-3 py-2 text-sm text-slate-300 hover:text-white"
               >
                 Settings
               </button>
@@ -373,48 +377,71 @@ export default function ProjectDetailPage() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0">
+          {success && (
+            <div className="mb-4 bg-green-900/30 border border-green-700 text-green-300 px-4 py-3 rounded">
+              {success}
+              <button onClick={() => setSuccess('')} className="ml-2 text-green-400">
+                ×
+              </button>
+            </div>
+          )}
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="mb-4 bg-red-900/30 border border-red-700 text-red-300 px-4 py-3 rounded">
               {error}
-              <button onClick={() => setError('')} className="ml-2 text-red-500">
+              <button onClick={() => setError('')} className="ml-2 text-red-400">
                 ×
               </button>
             </div>
           )}
 
           {/* Project Header */}
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="bg-slate-800 rounded-lg shadow p-6 mb-6 border border-slate-700">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
+                <h1 className="text-2xl font-bold text-white">{project.name}</h1>
                 {project.description && (
-                  <p className="mt-2 text-gray-600">{project.description}</p>
+                  <p className="mt-2 text-slate-300">{project.description}</p>
                 )}
-                <div className="mt-4 flex items-center space-x-4 text-sm text-gray-500">
+                <div className="mt-4 flex items-center space-x-4 text-sm text-slate-400">
                   <span>{variables.length} variable{variables.length !== 1 ? 's' : ''}</span>
                   <span>Created {new Date(project.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
               <div className="flex space-x-2">
                 <button
-                  onClick={() => setShowUploadModal(true)}
+                  onClick={() => {
+                    setUploadMode('upload');
+                    setUploadContent('');
+                    setUploadError('');
+                    setShowUploadModal(true);
+                  }}
                   className="px-3 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
                 >
                   Upload .env
+                </button>
+                <button
+                  onClick={async () => {
+                    setUploadMode('update');
+                    setUploadError('');
+                    const result = await exportEnvFile(projectId);
+                    if (result.success && result.content) {
+                      setUploadContent(result.content);
+                    } else {
+                      setUploadError(result.error || 'Failed to load current .env data');
+                    }
+                    setShowUploadModal(true);
+                  }}
+                  className="px-3 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                >
+                  Update .env
                 </button>
                 {variables.length > 0 && (
                   <>
                     <button
                       onClick={handleExport}
-                      className="px-3 py-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                      className="px-3 py-2 text-sm bg-slate-700 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-600"
                     >
                       Export
-                    </button>
-                    <button
-                      onClick={copyEnvToClipboard}
-                      className="px-3 py-2 ml-2 text-sm bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-                    >
-                      Copy .env
                     </button>
                   </>
                 )}
@@ -423,21 +450,31 @@ export default function ProjectDetailPage() {
           </div>
 
           {/* Environment Variables */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h2 className="text-lg font-medium text-gray-900">Environment Variables</h2>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
-              >
-                Add Variable
-              </button>
+          <div className="bg-slate-800 rounded-lg shadow border border-slate-700">
+            <div className="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
+              <h2 className="text-lg font-medium text-white">Environment Variables</h2>
+              <div className="flex space-x-2">
+                {variables.length > 0 && (
+                  <button
+                    onClick={copyEnvToClipboard}
+                    className="px-3 py-1.5 text-sm bg-slate-700 border border-slate-600 text-slate-300 rounded hover:bg-slate-600"
+                  >
+                    Copy .env
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                >
+                  Add Variable
+                </button>
+              </div>
             </div>
 
             {variables.length === 0 ? (
               <div className="px-6 py-12 text-center">
                 <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
+                  className="mx-auto h-12 w-12 text-slate-600"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -449,29 +486,29 @@ export default function ProjectDetailPage() {
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No variables</h3>
-                <p className="mt-1 text-sm text-gray-500">
+                <h3 className="mt-2 text-sm font-medium text-white">No variables</h3>
+                <p className="mt-1 text-sm text-slate-400">
                   Upload a .env file or add variables manually.
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-200">
+              <div className="divide-y divide-slate-700">
                 {variables.map((variable) => (
                   <div key={variable.id} className="px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center">
-                          <code className="text-sm font-mono font-semibold text-gray-900">
+                          <code className="text-sm font-mono font-semibold text-white">
                             {variable.key}
                           </code>
                           {variable.isSecret && (
-                            <span className="ml-2 px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded">
+                            <span className="ml-2 px-1.5 py-0.5 text-xs bg-yellow-900/30 text-yellow-300 rounded">
                               secret
                             </span>
                           )}
                         </div>
                         <div className="mt-1 flex items-center space-x-2">
-                          <code className="text-sm font-mono text-gray-600 truncate max-w-md">
+                          <code className="text-sm font-mono text-slate-400 truncate max-w-md">
                             {revealedKeys.has(variable.key)
                               ? decryptingKey === variable.key
                                 ? 'Decrypting...'
@@ -480,13 +517,13 @@ export default function ProjectDetailPage() {
                           </code>
                         </div>
                         {variable.description && (
-                          <p className="mt-1 text-xs text-gray-500">{variable.description}</p>
+                          <p className="mt-1 text-xs text-slate-500">{variable.description}</p>
                         )}
                       </div>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => toggleReveal(variable.key)}
-                          className="p-1.5 text-gray-400 hover:text-gray-600"
+                          className="p-1.5 text-slate-500 hover:text-slate-300"
                           title={revealedKeys.has(variable.key) ? 'Hide' : 'Reveal'}
                         >
                           {revealedKeys.has(variable.key) ? (
@@ -502,7 +539,7 @@ export default function ProjectDetailPage() {
                         </button>
                         <button
                           onClick={() => copyToClipboard(decryptedValues.get(variable.key) || variable.value)}
-                          className="p-1.5 text-gray-400 hover:text-gray-600"
+                          className="p-1.5 text-slate-500 hover:text-slate-300"
                           title="Copy to clipboard"
                         >
                           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -511,7 +548,7 @@ export default function ProjectDetailPage() {
                         </button>
                         <button
                           onClick={() => handleDeleteVariable(variable.key)}
-                          className="p-1.5 text-red-400 hover:text-red-600"
+                          className="p-1.5 text-red-500 hover:text-red-400"
                           title="Delete"
                         >
                           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -530,20 +567,20 @@ export default function ProjectDetailPage() {
 
       {/* Edit Project Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4 border border-slate-700">
             <form onSubmit={handleUpdateProject}>
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Project Settings</h3>
+              <div className="px-6 py-4 border-b border-slate-700">
+                <h3 className="text-lg font-medium text-white">Project Settings</h3>
               </div>
               <div className="px-6 py-4 space-y-4">
                 {editError && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+                  <div className="bg-red-900/30 border border-red-700 text-red-300 px-3 py-2 rounded text-sm">
                     {editError}
                   </div>
                 )}
                 <div>
-                  <label htmlFor="editName" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="editName" className="block text-sm font-medium text-slate-300">
                     Project Name
                   </label>
                   <input
@@ -552,11 +589,11 @@ export default function ProjectDetailPage() {
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-slate-600 rounded-md shadow-sm bg-slate-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
                 <div>
-                  <label htmlFor="editDescription" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="editDescription" className="block text-sm font-medium text-slate-300">
                     Description
                   </label>
                   <textarea
@@ -564,24 +601,24 @@ export default function ProjectDetailPage() {
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     rows={3}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-slate-600 rounded-md shadow-sm bg-slate-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
-                <div className="pt-4 border-t">
+                <div className="pt-4 border-t border-slate-700">
                   <button
                     type="button"
                     onClick={() => setShowDeleteModal(true)}
-                    className="text-red-600 hover:text-red-700 text-sm"
+                    className="text-red-400 hover:text-red-300 text-sm"
                   >
                     Delete this project
                   </button>
                 </div>
               </div>
-              <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+              <div className="px-6 py-4 border-t border-slate-700 flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600"
                 >
                   Cancel
                 </button>
@@ -600,21 +637,21 @@ export default function ProjectDetailPage() {
 
       {/* Delete Project Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Delete Project</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4 border border-slate-700">
+            <div className="px-6 py-4 border-b border-slate-700">
+              <h3 className="text-lg font-medium text-white">Delete Project</h3>
             </div>
             <div className="px-6 py-4">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-300">
                 Are you sure you want to delete this project? This action cannot be undone and will delete all environment variables.
               </p>
             </div>
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+            <div className="px-6 py-4 border-t border-slate-700 flex justify-end space-x-3">
               <button
                 type="button"
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600"
               >
                 Cancel
               </button>
@@ -632,33 +669,35 @@ export default function ProjectDetailPage() {
 
       {/* Upload .env Modal */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 border border-slate-700">
             <form onSubmit={handleUpload}>
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Upload .env Content</h3>
+              <div className="px-6 py-4 border-b border-slate-700">
+                <h3 className="text-lg font-medium text-white">
+                  {uploadMode === 'update' ? 'Update .env File' : 'Upload .env Content'}
+                </h3>
               </div>
               <div className="px-6 py-4 space-y-4">
                 {uploadError && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+                  <div className="bg-red-900/30 border border-red-700 text-red-300 px-3 py-2 rounded text-sm">
                     {uploadError}
                   </div>
                 )}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Choose a .env file or paste content below
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    {uploadMode === 'update' ? 'Select updated .env file or edit content below' : 'Choose a .env file or paste content below'}
                   </label>
                   <input
                     ref={fileInputRef}
                     type="file"
                     accept=".env,.env.*,text/plain"
                     onChange={handleFileSelect}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                    className="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
                   />
                 </div>
                 <div>
-                  <label htmlFor="envContent" className="block text-sm font-medium text-gray-700">
-                    Or paste your .env file content
+                  <label htmlFor="envContent" className="block text-sm font-medium text-slate-300">
+                    {uploadMode === 'update' ? 'Current .env content - Edit as needed' : 'Or paste your .env file content'}
                   </label>
                   <textarea
                     id="envContent"
@@ -666,7 +705,7 @@ export default function ProjectDetailPage() {
                     onChange={(e) => setUploadContent(e.target.value)}
                     required
                     rows={12}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm font-mono text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="mt-1 block w-full px-3 py-2 border border-slate-600 rounded-md shadow-sm font-mono text-sm bg-slate-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     placeholder="# Paste your .env content here&#10;API_KEY=your_api_key&#10;DATABASE_URL=postgres://..."
                   />
                 </div>
@@ -676,23 +715,24 @@ export default function ProjectDetailPage() {
                     id="overwrite"
                     checked={uploadOverwrite}
                     onChange={(e) => setUploadOverwrite(e.target.checked)}
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 bg-slate-700 border-slate-600 rounded"
                   />
-                  <label htmlFor="overwrite" className="ml-2 text-sm text-gray-700">
-                    Overwrite existing variables (replaces all existing variables)
+                  <label htmlFor="overwrite" className="ml-2 text-sm text-slate-300">
+                    {uploadMode === 'update' ? 'Replace all existing variables with this file' : 'Overwrite existing variables (replaces all existing variables)'}
                   </label>
                 </div>
               </div>
-              <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+              <div className="px-6 py-4 border-t border-slate-700 flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => {
                     setShowUploadModal(false);
+                    setUploadMode('upload');
                     setUploadError('');
                     setUploadContent('');
                     setUploadOverwrite(false);
                   }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600"
                 >
                   Cancel
                 </button>
@@ -701,7 +741,7 @@ export default function ProjectDetailPage() {
                   disabled={isUploading || (!uploadContent.trim() && !fileInputRef.current?.files?.[0])}
                   className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
                 >
-                  {isUploading ? 'Uploading...' : 'Upload'}
+                  {isUploading ? (uploadMode === 'update' ? 'Updating...' : 'Uploading...') : (uploadMode === 'update' ? 'Update' : 'Upload')}
                 </button>
               </div>
             </form>
@@ -711,20 +751,20 @@ export default function ProjectDetailPage() {
 
       {/* Add Variable Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4 border border-slate-700">
             <form onSubmit={handleAddVariable}>
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Add Variable</h3>
+              <div className="px-6 py-4 border-b border-slate-700">
+                <h3 className="text-lg font-medium text-white">Add Variable</h3>
               </div>
               <div className="px-6 py-4 space-y-4">
                 {addError && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+                  <div className="bg-red-900/30 border border-red-700 text-red-300 px-3 py-2 rounded text-sm">
                     {addError}
                   </div>
                 )}
                 <div>
-                  <label htmlFor="varKey" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="varKey" className="block text-sm font-medium text-slate-300">
                     Variable Name
                   </label>
                   <input
@@ -734,15 +774,15 @@ export default function ProjectDetailPage() {
                     onChange={(e) => setNewVarKey(e.target.value.toUpperCase())}
                     required
                     pattern="^[A-Za-z_][A-Za-z0-9_]*$"
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm font-mono focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-slate-600 rounded-md shadow-sm font-mono bg-slate-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="MY_VARIABLE"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-slate-400">
                     Only letters, numbers, and underscores. Must start with a letter or underscore.
                   </p>
                 </div>
                 <div>
-                  <label htmlFor="varValue" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="varValue" className="block text-sm font-medium text-slate-300">
                     Value
                   </label>
                   <textarea
@@ -751,12 +791,12 @@ export default function ProjectDetailPage() {
                     onChange={(e) => setNewVarValue(e.target.value)}
                     required
                     rows={3}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm font-mono focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-slate-600 rounded-md shadow-sm font-mono bg-slate-700 text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="your_value_here"
                   />
                 </div>
               </div>
-              <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+              <div className="px-6 py-4 border-t border-slate-700 flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -765,7 +805,7 @@ export default function ProjectDetailPage() {
                     setNewVarKey('');
                     setNewVarValue('');
                   }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600"
                 >
                   Cancel
                 </button>

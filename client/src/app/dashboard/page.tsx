@@ -35,7 +35,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login');
+      router.push('/');
     }
   }, [isLoading, isAuthenticated, router]);
 
@@ -53,7 +53,7 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/login');
+    router.push('/');
   };
 
   const handleImportSelectTeam = async (teamId: string) => {
@@ -120,20 +120,30 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Navigation */}
+      <nav className="sticky top-0 z-40 bg-slate-800/95 border-b border-slate-700 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+          <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">EnvMate</h1>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">E</span>
+                </div>
+                <span className="text-xl font-bold text-white">EnvMate</span>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">
-                {user.name} ({user.email})
-              </span>
+              <div className="text-sm">
+                <p className="font-medium text-white">{user.name}</p>
+                <p className="text-xs text-slate-400">{user.email}</p>
+              </div>
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="px-4 py-2 text-sm font-medium text-slate-100 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
               >
                 Sign out
               </button>
@@ -142,126 +152,189 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">
-              Welcome, {user.name}!
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-500">Account Status</h3>
-                <div className="mt-2 flex items-center">
-                  {user.email_verified ? (
-                    <>
-                      <span className="h-2 w-2 bg-green-400 rounded-full mr-2"></span>
-                      <span className="text-sm text-gray-900">Email Verified</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="h-2 w-2 bg-yellow-400 rounded-full mr-2"></span>
-                      <span className="text-sm text-gray-900">Email Not Verified</span>
-                    </>
-                  )}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Welcome back, {user.name}!
+          </h1>
+          <p className="text-slate-400">Manage your environment variables and teams with ease</p>
+        </div>
+
+        {/* Email Verification Alert */}
+        {!user.email_verified && (
+          <div className="mb-6 bg-gradient-to-r from-amber-900/30 to-amber-800/20 border border-amber-700/50 rounded-lg p-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mt-0.5">
+                <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-semibold text-amber-200">
+                  Email verification pending
+                </h3>
+                <p className="mt-1 text-sm text-amber-100/80">
+                  Verify your email address to unlock all features. Check your inbox for a verification link.
+                </p>
+                <button className="mt-3 text-sm font-medium text-amber-300 hover:text-amber-200 transition-colors">
+                  Resend verification email
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 shadow-lg hover:shadow-xl hover:border-slate-600 transition-all">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Account Status</p>
+                <div className="flex items-center space-x-2">
+                  <span className={`h-2 w-2 rounded-full ${user.email_verified ? 'bg-green-500' : 'bg-amber-500'}`}></span>
+                  <p className="text-lg font-semibold text-white">
+                    {user.email_verified ? 'Verified' : 'Pending'}
+                  </p>
                 </div>
               </div>
+              <div className={`p-3 rounded-lg ${user.email_verified ? 'bg-green-900/30' : 'bg-amber-900/30'}`}>
+                <svg className={`h-6 w-6 ${user.email_verified ? 'text-green-400' : 'text-amber-400'}`} fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
 
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-500">Member Since</h3>
-                <p className="mt-2 text-sm text-gray-900">
-                  {new Date(user.created_at).toLocaleDateString()}
+          <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 shadow-lg hover:shadow-xl hover:border-slate-600 transition-all">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Member Since</p>
+                <p className="text-lg font-semibold text-white">
+                  {new Date(user.created_at).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short' 
+                  })}
                 </p>
               </div>
+              <div className="p-3 rounded-lg bg-blue-900/30">
+                <svg className="h-6 w-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
+                </svg>
+              </div>
+            </div>
+          </div>
 
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="text-sm font-medium text-gray-500">Last Login</h3>
-                <p className="mt-2 text-sm text-gray-900">
+          <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 shadow-lg hover:shadow-xl hover:border-slate-600 transition-all">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-400 mb-1">Last Login</p>
+                <p className="text-lg font-semibold text-white">
                   {user.last_login_at
-                    ? new Date(user.last_login_at).toLocaleString()
+                    ? new Date(user.last_login_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                      })
                     : 'First login'}
                 </p>
               </div>
+              <div className="p-3 rounded-lg bg-purple-900/30">
+                <svg className="h-6 w-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10.5 1.5H5.75A2.75 2.75 0 003 4.25v11A2.75 2.75 0 005.75 18h8.5A2.75 2.75 0 0017 15.25v-9m-1.5-4h-5M10.5 1.5v3m-7-3v3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                  <path d="M7 10h6M7 13h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </div>
             </div>
+          </div>
+        </div>
 
-            {!user.email_verified && (
-              <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg
-                      className="h-5 w-5 text-yellow-400"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-2 mb-6">
+            <h2 className="text-2xl font-bold text-white">Quick Actions</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-slate-700 to-transparent"></div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link 
+              href="/teams" 
+              className="group relative bg-slate-800 rounded-lg border border-slate-700 p-5 hover:border-indigo-500/50 hover:shadow-lg transition-all overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-indigo-900/30 rounded-lg group-hover:scale-110 transition-transform">
+                    <svg className="h-5 w-5 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.343a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM15.657 14.657a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM11 17a1 1 0 102 0v-1a1 1 0 10-2 0v1zM5.343 15.657a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM3 10a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.343 5.343a1 1 0 001.414-1.414L6.05 3.222a1 1 0 00-1.414 1.414l.707.707z" />
                     </svg>
                   </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-yellow-800">
-                      Verify your email
-                    </h3>
-                    <div className="mt-2 text-sm text-yellow-700">
-                      <p>
-                        Please verify your email address to access all features.
-                        Check your inbox for a verification link.
-                      </p>
-                    </div>
-                    <div className="mt-4">
-                      <button className="text-sm font-medium text-yellow-800 hover:text-yellow-600">
-                        Resend verification email
-                      </button>
-                    </div>
+                </div>
+                <h3 className="font-semibold text-white mb-1">Project</h3>
+                <p className="text-sm text-slate-400">Create and manage your project</p>
+              </div>
+            </Link>
+
+            <Link 
+              href="/teams" 
+              className="group relative bg-slate-800 rounded-lg border border-slate-700 p-5 hover:border-green-500/50 hover:shadow-lg transition-all overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-green-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-green-900/30 rounded-lg group-hover:scale-110 transition-transform">
+                    <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10.5 1.5H5.75A2.75 2.75 0 003 4.25v11A2.75 2.75 0 005.75 18h8.5A2.75 2.75 0 0017 15.25v-9m-1.5-4h-5M10.5 1.5v3m-7-3v3M7 10h6M7 13h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                    </svg>
                   </div>
                 </div>
+                <h3 className="font-semibold text-white mb-1">Teams</h3>
+                <p className="text-sm text-slate-400">Create and manage your teams</p>
               </div>
-            )}
+            </Link>
 
-            <div className="mt-8">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Quick Actions
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Link href="/teams" className="p-4 bg-indigo-50 rounded-lg text-left hover:bg-indigo-100 transition-colors block">
-                  <div className="text-indigo-600 font-medium">Create Project</div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Start a new environment project
-                  </p>
-                </Link>
-                <Link href="/teams" className="p-4 bg-green-50 rounded-lg text-left hover:bg-green-100 transition-colors block">
-                  <div className="text-green-600 font-medium">Manage Teams</div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Create and manage your teams
-                  </p>
-                </Link>
-                <button
-                  onClick={() => {
-                    setShowImportModal(true);
-                    setImportStep('select');
-                    setImportContent('');
-                    setImportTeamId('');
-                    setImportProjectId('');
-                    setImportError('');
-                    setTeamProjects([]);
-                  }}
-                  className="p-4 bg-purple-50 rounded-lg text-left hover:bg-purple-100 transition-colors"
-                >
-                  <div className="text-purple-600 font-medium">Import .env</div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Import existing environment files
-                  </p>
-                </button>
-                <Link href="/teams" className="p-4 bg-gray-100 rounded-lg text-left hover:bg-gray-200 transition-colors block">
-                  <div className="text-gray-600 font-medium">Settings</div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Manage your teams &amp; projects
-                  </p>
-                </Link>
+            <button
+              onClick={() => {
+                setShowImportModal(true);
+                setImportStep('select');
+                setImportContent('');
+                setImportTeamId('');
+                setImportProjectId('');
+                setImportError('');
+                setTeamProjects([]);
+              }}
+              className="group relative bg-slate-800 rounded-lg border border-slate-700 p-5 hover:border-purple-500/50 hover:shadow-lg transition-all overflow-hidden text-left cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-purple-900/30 rounded-lg group-hover:scale-110 transition-transform">
+                    <svg className="h-5 w-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="font-semibold text-white mb-1">Import .env</h3>
+                <p className="text-sm text-slate-400">Import existing environment files</p>
               </div>
-            </div>
+            </button>
+
+            <Link 
+              href="/teams" 
+              className="group relative bg-slate-800 rounded-lg border border-slate-700 p-5 hover:border-slate-600 hover:shadow-lg transition-all overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-700/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-slate-700/50 rounded-lg group-hover:scale-110 transition-transform">
+                    <svg className="h-5 w-5 text-slate-300" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="font-semibold text-white mb-1">Settings</h3>
+                <p className="text-sm text-slate-400">Manage your account & preferences</p>
+              </div>
+            </Link>
           </div>
         </div>
       </main>
@@ -271,16 +344,16 @@ export default function DashboardPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4">
             <div
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+              className="fixed inset-0 bg-black/50 transition-opacity"
               onClick={() => setShowImportModal(false)}
             />
-            <div className="relative bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="relative bg-slate-800 rounded-lg shadow-xl max-w-lg w-full p-6 border border-slate-700">
+              <h2 className="text-lg font-medium text-white mb-4">
                 Import .env File
               </h2>
 
               {importError && (
-                <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+                <div className="mb-4 bg-red-900/30 border border-red-700/50 text-red-200 px-4 py-3 rounded text-sm">
                   {importError}
                 </div>
               )}
@@ -289,7 +362,7 @@ export default function DashboardPage() {
                 <div className="space-y-4">
                   {teams.length === 0 ? (
                     <div className="text-center py-6">
-                      <p className="text-gray-500 text-sm">You need to create a team and project first.</p>
+                      <p className="text-slate-400 text-sm">You need to create a team and project first.</p>
                       <Link
                         href="/teams"
                         className="mt-3 inline-block px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
@@ -300,11 +373,11 @@ export default function DashboardPage() {
                   ) : (
                     <>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700">Select Team</label>
+                        <label className="block text-sm font-medium text-slate-200">Select Team</label>
                         <select
                           value={importTeamId}
                           onChange={(e) => handleImportSelectTeam(e.target.value)}
-                          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          className="mt-1 block w-full px-3 py-2 border border-slate-600 bg-slate-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         >
                           <option value="">Choose a team...</option>
                           {teams.map((t) => (
@@ -315,11 +388,11 @@ export default function DashboardPage() {
 
                       {importTeamId && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700">Select Project</label>
+                          <label className="block text-sm font-medium text-slate-200">Select Project</label>
                           {teamProjects.length === 0 ? (
-                            <p className="mt-1 text-sm text-gray-500">
+                            <p className="mt-1 text-sm text-slate-400">
                               No projects in this team.{' '}
-                              <Link href={`/teams/${importTeamId}/projects`} className="text-indigo-600 hover:text-indigo-700">
+                              <Link href={`/teams/${importTeamId}/projects`} className="text-indigo-400 hover:text-indigo-300">
                                 Create one
                               </Link>
                             </p>
@@ -327,7 +400,7 @@ export default function DashboardPage() {
                             <select
                               value={importProjectId}
                               onChange={(e) => setImportProjectId(e.target.value)}
-                              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                              className="mt-1 block w-full px-3 py-2 border border-slate-600 bg-slate-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                             >
                               <option value="">Choose a project...</option>
                               {teamProjects.map((p) => (
@@ -342,7 +415,7 @@ export default function DashboardPage() {
                         <button
                           type="button"
                           onClick={() => setShowImportModal(false)}
-                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                          className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600"
                         >
                           Cancel
                         </button>
@@ -361,7 +434,7 @@ export default function DashboardPage() {
               ) : (
                 <form onSubmit={handleImportSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-slate-200 mb-2">
                       Choose a .env file
                     </label>
                     <input
@@ -369,11 +442,11 @@ export default function DashboardPage() {
                       type="file"
                       accept=".env,.env.*,text/plain"
                       onChange={handleImportFileSelect}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                      className="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-900/50 file:text-indigo-300 hover:file:bg-indigo-900"
                     />
                   </div>
                   <div>
-                    <label htmlFor="importContent" className="block text-sm font-medium text-gray-700">
+                    <label htmlFor="importContent" className="block text-sm font-medium text-slate-200">
                       Or paste .env content
                     </label>
                     <textarea
@@ -382,7 +455,7 @@ export default function DashboardPage() {
                       onChange={(e) => setImportContent(e.target.value)}
                       required
                       rows={10}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm font-mono text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                      className="mt-1 block w-full px-3 py-2 border border-slate-600 bg-slate-700 text-white rounded-md shadow-sm font-mono text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 placeholder:text-slate-500"
                       placeholder="API_KEY=your_api_key&#10;DATABASE_URL=postgres://..."
                     />
                   </div>
@@ -390,7 +463,7 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       onClick={() => setImportStep('select')}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                      className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600"
                     >
                       Back
                     </button>

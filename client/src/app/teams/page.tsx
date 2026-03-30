@@ -53,8 +53,8 @@ export default function TeamsPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="text-slate-400">Loading...</div>
       </div>
     );
   }
@@ -64,16 +64,16 @@ export default function TeamsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <nav className="bg-slate-800/95 border-b border-slate-700 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link href="/dashboard" className="text-xl font-bold text-gray-900">
+              <Link href="/dashboard" className="text-xl font-bold text-white">
                 EnvMate
               </Link>
-              <span className="ml-4 text-gray-500">/</span>
-              <span className="ml-4 text-gray-700">Teams</span>
+              <span className="ml-4 text-slate-600">/</span>
+              <span className="ml-4 text-slate-300">Teams</span>
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function TeamsPage() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Your Teams</h1>
+            <h1 className="text-2xl font-bold text-white">Your Teams</h1>
             <button
               onClick={() => setShowCreateModal(true)}
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
@@ -93,12 +93,12 @@ export default function TeamsPage() {
 
           {teamsLoading ? (
             <div className="text-center py-12">
-              <div className="text-gray-500">Loading teams...</div>
+              <div className="text-slate-400">Loading teams...</div>
             </div>
           ) : teams.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-lg shadow">
+            <div className="text-center py-12 bg-slate-800 rounded-lg shadow-lg border border-slate-700">
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-slate-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -110,8 +110,8 @@ export default function TeamsPage() {
                   d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No teams</h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <h3 className="mt-2 text-sm font-medium text-white">No teams</h3>
+              <p className="mt-1 text-sm text-slate-400">
                 Get started by creating a new team.
               </p>
               <div className="mt-6">
@@ -129,32 +129,32 @@ export default function TeamsPage() {
                 <div
                   key={team.id}
                   onClick={() => handleSelectTeam(team)}
-                  className="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer p-6"
+                  className="bg-slate-800 rounded-lg shadow-lg hover:shadow-xl hover:border-slate-600 transition-all cursor-pointer p-6 border border-slate-700"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900">
+                      <h3 className="text-lg font-medium text-white">
                         {team.name}
                       </h3>
                       {team.description && (
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                        <p className="mt-1 text-sm text-slate-400 line-clamp-2">
                           {team.description}
                         </p>
                       )}
                     </div>
                     <span
-                      className={`px-2 py-1 text-xs rounded-full ${
+                      className={`px-2 py-1 text-xs rounded-full font-medium ${
                         team.user_role === 'admin'
-                          ? 'bg-purple-100 text-purple-800'
+                          ? 'bg-purple-900/30 text-purple-300 border border-purple-700/50'
                           : team.user_role === 'editor'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
+                          ? 'bg-blue-900/30 text-blue-300 border border-blue-700/50'
+                          : 'bg-slate-700 text-slate-200'
                       }`}
                     >
                       {team.user_role}
                     </span>
                   </div>
-                  <div className="mt-4 flex items-center text-sm text-gray-500">
+                  <div className="mt-4 flex items-center text-sm text-slate-400">
                     <svg
                       className="h-4 w-4 mr-1"
                       fill="none"
@@ -182,23 +182,23 @@ export default function TeamsPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4">
             <div
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+              className="fixed inset-0 bg-black/50 transition-opacity"
               onClick={() => setShowCreateModal(false)}
             />
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="relative bg-slate-800 rounded-lg shadow-xl max-w-md w-full p-6 border border-slate-700">
+              <h2 className="text-lg font-medium text-white mb-4">
                 Create New Team
               </h2>
               <form onSubmit={handleCreateTeam}>
                 {createError && (
-                  <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                  <div className="mb-4 bg-red-900/30 border border-red-700/50 text-red-200 px-4 py-3 rounded">
                     {createError}
                   </div>
                 )}
                 <div className="mb-4">
                   <label
                     htmlFor="teamName"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-slate-200"
                   >
                     Team Name
                   </label>
@@ -208,14 +208,14 @@ export default function TeamsPage() {
                     value={newTeamName}
                     onChange={(e) => setNewTeamName(e.target.value)}
                     required
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2"
+                    className="mt-1 block w-full rounded-md border-slate-600 bg-slate-700 text-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2 placeholder-slate-400"
                     placeholder="My Awesome Team"
                   />
                 </div>
                 <div className="mb-4">
                   <label
                     htmlFor="teamDescription"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-sm font-medium text-slate-200"
                   >
                     Description (optional)
                   </label>
@@ -224,7 +224,7 @@ export default function TeamsPage() {
                     value={newTeamDescription}
                     onChange={(e) => setNewTeamDescription(e.target.value)}
                     rows={3}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2"
+                    className="mt-1 block w-full rounded-md border-slate-600 bg-slate-700 text-white focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2 placeholder-slate-400"
                     placeholder="A brief description of your team"
                   />
                 </div>
@@ -232,7 +232,7 @@ export default function TeamsPage() {
                   <button
                     type="button"
                     onClick={() => setShowCreateModal(false)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                    className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600"
                   >
                     Cancel
                   </button>

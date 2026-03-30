@@ -70,8 +70,8 @@ export default function TeamProjectsPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-600">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="text-slate-400">Loading...</div>
       </div>
     );
   }
@@ -81,24 +81,24 @@ export default function TeamProjectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <nav className="bg-slate-800/95 border-b border-slate-700 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link href="/dashboard" className="text-xl font-bold text-gray-900">
+              <Link href="/dashboard" className="text-xl font-bold text-white">
                 EnvMate
               </Link>
-              <span className="ml-4 text-gray-500">/</span>
-              <Link href="/teams" className="ml-4 text-gray-700 hover:text-gray-900">
+              <span className="ml-4 text-slate-600">/</span>
+              <Link href="/teams" className="ml-4 text-slate-300 hover:text-white">
                 Teams
               </Link>
-              <span className="ml-4 text-gray-500">/</span>
-              <Link href={`/teams/${teamId}`} className="ml-4 text-gray-700 hover:text-gray-900">
+              <span className="ml-4 text-slate-600">/</span>
+              <Link href={`/teams/${teamId}`} className="ml-4 text-slate-300 hover:text-white">
                 {team?.name || 'Team'}
               </Link>
-              <span className="ml-4 text-gray-500">/</span>
-              <span className="ml-4 text-gray-900">Projects</span>
+              <span className="ml-4 text-slate-600">/</span>
+              <span className="ml-4 text-white">Projects</span>
             </div>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default function TeamProjectsPage() {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-0">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+            <h1 className="text-2xl font-bold text-white">Projects</h1>
             {canCreateProject && (
               <button
                 onClick={() => setShowCreateModal(true)}
@@ -120,12 +120,12 @@ export default function TeamProjectsPage() {
 
           {projectsLoading ? (
             <div className="text-center py-12">
-              <div className="text-gray-500">Loading projects...</div>
+              <div className="text-slate-400">Loading projects...</div>
             </div>
           ) : projects.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-lg shadow">
+            <div className="text-center py-12 bg-slate-800 rounded-lg shadow-lg border border-slate-700">
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 text-slate-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -137,8 +137,8 @@ export default function TeamProjectsPage() {
                   d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No projects</h3>
-              <p className="mt-1 text-sm text-gray-500">Get started by creating a new project.</p>
+              <h3 className="mt-2 text-sm font-medium text-white">No projects</h3>
+              <p className="mt-1 text-sm text-slate-400">Get started by creating a new project.</p>
               {canCreateProject && (
                 <div className="mt-6">
                   <button
@@ -156,19 +156,19 @@ export default function TeamProjectsPage() {
                 <Link
                   key={project.id}
                   href={`/projects/${project.id}`}
-                  className="block bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+                  className="block bg-slate-800 rounded-lg shadow-lg hover:shadow-xl hover:border-slate-600 transition-all border border-slate-700"
                 >
                   <div className="p-6">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium text-gray-900">{project.name}</h3>
-                      <span className="text-xs text-gray-500">
+                      <h3 className="text-lg font-medium text-white">{project.name}</h3>
+                      <span className="text-xs text-slate-400">
                         {project.envFiles?.length || 0} env file{project.envFiles?.length !== 1 ? 's' : ''}
                       </span>
                     </div>
                     {project.description && (
-                      <p className="mt-2 text-sm text-gray-600 line-clamp-2">{project.description}</p>
+                      <p className="mt-2 text-sm text-slate-400 line-clamp-2">{project.description}</p>
                     )}
-                    <div className="mt-4 flex items-center text-xs text-gray-500">
+                    <div className="mt-4 flex items-center text-xs text-slate-500">
                       <span>
                         Created {new Date(project.created_at).toLocaleDateString()}
                       </span>
@@ -183,20 +183,20 @@ export default function TeamProjectsPage() {
 
       {/* Create Project Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-lg shadow-xl max-w-md w-full border border-slate-700">
             <form onSubmit={handleCreateProject}>
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Create New Project</h3>
+              <div className="px-6 py-4 border-b border-slate-700">
+                <h3 className="text-lg font-medium text-white">Create New Project</h3>
               </div>
               <div className="px-6 py-4 space-y-4">
                 {createError && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+                  <div className="bg-red-900/30 border border-red-700/50 text-red-200 px-3 py-2 rounded text-sm">
                     {createError}
                   </div>
                 )}
                 <div>
-                  <label htmlFor="projectName" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="projectName" className="block text-sm font-medium text-slate-200">
                     Project Name
                   </label>
                   <input
@@ -205,12 +205,12 @@ export default function TeamProjectsPage() {
                     value={newProjectName}
                     onChange={(e) => setNewProjectName(e.target.value)}
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-slate-600 bg-slate-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400"
                     placeholder="My Project"
                   />
                 </div>
                 <div>
-                  <label htmlFor="projectDescription" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="projectDescription" className="block text-sm font-medium text-slate-200">
                     Description (optional)
                   </label>
                   <textarea
@@ -218,12 +218,12 @@ export default function TeamProjectsPage() {
                     value={newProjectDescription}
                     onChange={(e) => setNewProjectDescription(e.target.value)}
                     rows={3}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-slate-600 bg-slate-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400"
                     placeholder="Project description..."
                   />
                 </div>
               </div>
-              <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+              <div className="px-6 py-4 border-t border-slate-700 flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -232,7 +232,7 @@ export default function TeamProjectsPage() {
                     setNewProjectName('');
                     setNewProjectDescription('');
                   }}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600"
                 >
                   Cancel
                 </button>
