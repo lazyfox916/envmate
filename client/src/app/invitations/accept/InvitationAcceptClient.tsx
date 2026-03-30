@@ -103,7 +103,7 @@ export default function InvitationAcceptClient() {
           </div>
         ) : (
           <div>
-            <p className="mb-4 text-slate-300">
+            <p className="mb-4 text-slate-300 w-full break-words">
               Token: <span className="font-mono text-sm text-slate-200">{token}</span>
             </p>
 

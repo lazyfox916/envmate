@@ -23,19 +23,18 @@ export default function TeamProjectsPage() {
   const [createError, setCreateError] = useState('');
   const [isCreating, setIsCreating] = useState(false);
 
-  // Prevent double-fetch
   const loadedRef = useRef(false);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login');
+      router.push('/');
     }
   }, [authLoading, isAuthenticated, router]);
 
   useEffect(() => {
     if (isAuthenticated && teamId && !loadedRef.current) {
       loadedRef.current = true;
-      // Fetch team info and projects in parallel
+
       getTeamById(teamId).then((result) => {
         if (result.success && result.team) {
           setTeam({
@@ -44,6 +43,7 @@ export default function TeamProjectsPage() {
           });
         }
       });
+
       fetchProjects(teamId);
     }
   }, [isAuthenticated, teamId, getTeamById, fetchProjects]);
@@ -53,7 +53,11 @@ export default function TeamProjectsPage() {
     setCreateError('');
     setIsCreating(true);
 
-    const result = await createProject(teamId, newProjectName, newProjectDescription || undefined);
+    const result = await createProject(
+      teamId,
+      newProjectName,
+      newProjectDescription || undefined
+    );
 
     if (result.success) {
       setShowCreateModal(false);
@@ -63,6 +67,7 @@ export default function TeamProjectsPage() {
     } else {
       setCreateError(result.error || 'Failed to create project');
     }
+
     setIsCreating(false);
   };
 
@@ -70,8 +75,8 @@ export default function TeamProjectsPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="text-slate-400">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center bg-slate-900 px-4">
+        <div className="text-center text-slate-400">Loading...</div>
       </div>
     );
   }
@@ -82,36 +87,59 @@ export default function TeamProjectsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <nav className="bg-slate-800/95 border-b border-slate-700 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/dashboard" className="text-xl font-bold text-white">
+      <nav className="border-b border-slate-700 bg-slate-800/95 shadow-sm backdrop-blur-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex min-h-16 items-center py-3">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-2 text-sm sm:text-base">
+              <Link
+                href="/dashboard"
+                className="shrink-0 text-lg font-bold text-white sm:text-xl"
+              >
                 EnvMate
               </Link>
-              <span className="ml-4 text-slate-600">/</span>
-              <Link href="/teams" className="ml-4 text-slate-300 hover:text-white">
+
+              <span className="text-slate-600">/</span>
+
+              <Link
+                href="/teams"
+                className="text-slate-300 transition hover:text-white"
+              >
                 Teams
               </Link>
-              <span className="ml-4 text-slate-600">/</span>
-              <Link href={`/teams/${teamId}`} className="ml-4 text-slate-300 hover:text-white">
+
+              <span className="text-slate-600">/</span>
+
+              <Link
+                href={`/teams/${teamId}`}
+                className="max-w-[140px] truncate text-slate-300 transition hover:text-white sm:max-w-[220px]"
+              >
                 {team?.name || 'Team'}
               </Link>
-              <span className="ml-4 text-slate-600">/</span>
-              <span className="ml-4 text-white">Projects</span>
+
+              <span className="text-slate-600">/</span>
+
+              <span className="max-w-[120px] truncate font-medium text-white sm:max-w-none">
+                Projects
+              </span>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 sm:px-0">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-white">Projects</h1>
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div>
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-white sm:text-3xl">Projects</h1>
+              <p className="mt-1 text-sm text-slate-400">
+                Manage projects and environment files for this team.
+              </p>
+            </div>
+
             {canCreateProject && (
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 sm:w-auto"
               >
                 New Project
               </button>
@@ -119,11 +147,11 @@ export default function TeamProjectsPage() {
           </div>
 
           {projectsLoading ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <div className="text-slate-400">Loading projects...</div>
             </div>
           ) : projects.length === 0 ? (
-            <div className="text-center py-12 bg-slate-800 rounded-lg shadow-lg border border-slate-700">
+            <div className="rounded-lg border border-slate-700 bg-slate-800 px-6 py-12 text-center shadow-lg">
               <svg
                 className="mx-auto h-12 w-12 text-slate-600"
                 fill="none"
@@ -137,13 +165,17 @@ export default function TeamProjectsPage() {
                   d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
                 />
               </svg>
-              <h3 className="mt-2 text-sm font-medium text-white">No projects</h3>
-              <p className="mt-1 text-sm text-slate-400">Get started by creating a new project.</p>
+
+              <h3 className="mt-3 text-sm font-medium text-white">No projects</h3>
+              <p className="mt-1 text-sm text-slate-400">
+                Get started by creating a new project.
+              </p>
+
               {canCreateProject && (
                 <div className="mt-6">
                   <button
                     onClick={() => setShowCreateModal(true)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                    className="inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 sm:w-auto"
                   >
                     Create Project
                   </button>
@@ -151,23 +183,31 @@ export default function TeamProjectsPage() {
               )}
             </div>
           ) : (
-            <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
               {projects.map((project) => (
                 <Link
                   key={project.id}
                   href={`/projects/${project.id}`}
-                  className="block bg-slate-800 rounded-lg shadow-lg hover:shadow-xl hover:border-slate-600 transition-all border border-slate-700"
+                  className="block rounded-lg border border-slate-700 bg-slate-800 shadow-lg transition-all hover:border-slate-600 hover:shadow-xl"
                 >
-                  <div className="p-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium text-white">{project.name}</h3>
-                      <span className="text-xs text-slate-400">
-                        {project.envFiles?.length || 0} env file{project.envFiles?.length !== 1 ? 's' : ''}
+                  <div className="p-5 sm:p-6">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <h3 className="min-w-0 break-words text-lg font-medium text-white">
+                        {project.name}
+                      </h3>
+
+                      <span className="shrink-0 text-xs text-slate-400">
+                        {project.envFiles?.length || 0} env file
+                        {project.envFiles?.length !== 1 ? 's' : ''}
                       </span>
                     </div>
+
                     {project.description && (
-                      <p className="mt-2 text-sm text-slate-400 line-clamp-2">{project.description}</p>
+                      <p className="mt-2 break-words text-sm text-slate-400 line-clamp-3">
+                        {project.description}
+                      </p>
                     )}
+
                     <div className="mt-4 flex items-center text-xs text-slate-500">
                       <span>
                         Created {new Date(project.created_at).toLocaleDateString()}
@@ -181,22 +221,26 @@ export default function TeamProjectsPage() {
         </div>
       </main>
 
-      {/* Create Project Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 rounded-lg shadow-xl max-w-md w-full border border-slate-700">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-3 sm:items-center sm:p-4">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl border border-slate-700 bg-slate-800 shadow-xl">
             <form onSubmit={handleCreateProject}>
-              <div className="px-6 py-4 border-b border-slate-700">
+              <div className="border-b border-slate-700 px-4 py-4 sm:px-6">
                 <h3 className="text-lg font-medium text-white">Create New Project</h3>
               </div>
-              <div className="px-6 py-4 space-y-4">
+
+              <div className="space-y-4 px-4 py-4 sm:px-6">
                 {createError && (
-                  <div className="bg-red-900/30 border border-red-700/50 text-red-200 px-3 py-2 rounded text-sm">
+                  <div className="rounded border border-red-700/50 bg-red-900/30 px-3 py-2 text-sm text-red-200">
                     {createError}
                   </div>
                 )}
+
                 <div>
-                  <label htmlFor="projectName" className="block text-sm font-medium text-slate-200">
+                  <label
+                    htmlFor="projectName"
+                    className="block text-sm font-medium text-slate-200"
+                  >
                     Project Name
                   </label>
                   <input
@@ -205,25 +249,30 @@ export default function TeamProjectsPage() {
                     value={newProjectName}
                     onChange={(e) => setNewProjectName(e.target.value)}
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-slate-600 bg-slate-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400"
+                    className="mt-1 block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-white shadow-sm placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     placeholder="My Project"
                   />
                 </div>
+
                 <div>
-                  <label htmlFor="projectDescription" className="block text-sm font-medium text-slate-200">
+                  <label
+                    htmlFor="projectDescription"
+                    className="block text-sm font-medium text-slate-200"
+                  >
                     Description (optional)
                   </label>
                   <textarea
                     id="projectDescription"
                     value={newProjectDescription}
                     onChange={(e) => setNewProjectDescription(e.target.value)}
-                    rows={3}
-                    className="mt-1 block w-full px-3 py-2 border border-slate-600 bg-slate-700 text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm placeholder-slate-400"
+                    rows={4}
+                    className="mt-1 block w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-white shadow-sm placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
                     placeholder="Project description..."
                   />
                 </div>
               </div>
-              <div className="px-6 py-4 border-t border-slate-700 flex justify-end space-x-3">
+
+              <div className="flex flex-col-reverse gap-3 border-t border-slate-700 px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
                 <button
                   type="button"
                   onClick={() => {
@@ -232,14 +281,15 @@ export default function TeamProjectsPage() {
                     setNewProjectName('');
                     setNewProjectDescription('');
                   }}
-                  className="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-700 border border-slate-600 rounded-md hover:bg-slate-600"
+                  className="w-full rounded-md border border-slate-600 bg-slate-700 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-600 sm:w-auto"
                 >
                   Cancel
                 </button>
+
                 <button
                   type="submit"
                   disabled={isCreating || !newProjectName.trim()}
-                  className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                  className="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50 sm:w-auto"
                 >
                   {isCreating ? 'Creating...' : 'Create Project'}
                 </button>

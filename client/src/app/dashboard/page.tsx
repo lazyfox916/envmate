@@ -121,39 +121,42 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-40 bg-slate-800/95 border-b border-slate-700 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">E</span>
-                </div>
-                <span className="text-xl font-bold text-white">EnvMate</span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-sm">
-                <p className="font-medium text-white">{user.name}</p>
-                <p className="text-xs text-slate-400">{user.email}</p>
-              </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold">
-                {user.name.charAt(0).toUpperCase()}
-              </div>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-slate-100 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
-              >
-                Sign out
-              </button>
-            </div>
+     <nav className="sticky top-0 z-40 border-b border-slate-700 bg-slate-800/95 backdrop-blur-sm">
+  <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="flex min-h-16 flex-col gap-3 py-3 sm:min-h-[64px] sm:flex-row sm:items-center sm:justify-between sm:py-0">
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600">
+          <span className="text-lg font-bold text-white">E</span>
+        </div>
+        <span className="truncate text-lg font-bold text-white sm:text-xl">
+          EnvMate
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="min-w-0 text-sm">
+            <p className="truncate font-medium text-white">{user.name}</p>
+            <p className="truncate text-xs text-slate-400">{user.email}</p>
+          </div>
+
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 font-semibold text-white">
+            {user.name.charAt(0).toUpperCase()}
           </div>
         </div>
-      </nav>
+
+        <button
+          onClick={handleLogout}
+          className="w-full rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-slate-100 transition-colors hover:bg-slate-600 sm:w-auto"
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
             Welcome back, {user.name}!
@@ -161,7 +164,6 @@ export default function DashboardPage() {
           <p className="text-slate-400">Manage your environment variables and teams with ease</p>
         </div>
 
-        {/* Email Verification Alert */}
         {!user.email_verified && (
           <div className="mb-6 bg-gradient-to-r from-amber-900/30 to-amber-800/20 border border-amber-700/50 rounded-lg p-4">
             <div className="flex items-start">

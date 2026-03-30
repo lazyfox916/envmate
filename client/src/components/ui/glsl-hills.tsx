@@ -4,8 +4,6 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 type GLSLHillsProps = {
-  width?: string;
-  height?: string;
   cameraZ?: number;
   planeSize?: number;
   speed?: number;
@@ -16,14 +14,11 @@ type PlaneUniforms = {
 };
 
 const GLSLHills = ({
-  width = "100vw",
-  height = "100vh",
   cameraZ = 125,
   planeSize = 256,
   speed = 0.5,
 }: GLSLHillsProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -186,12 +181,11 @@ const GLSLHills = ({
           `,
           fragmentShader: `
             precision highp float;
-
             varying vec3 vPosition;
 
             void main(void) {
-              float opacity = (96.0 - length(vPosition)) / 256.0 * 0.6;
-              vec3 color = vec3(0.6);
+              float opacity = (96.0 - length(vPosition)) / 256.0 * 0.65;
+              vec3 color = vec3(0.82, 0.82, 0.82);
               gl_FragColor = vec4(color, opacity);
             }
           `,
@@ -208,17 +202,12 @@ const GLSLHills = ({
 
     const renderer = new THREE.WebGLRenderer({
       canvas: canvasRef.current,
-      antialias: false,
-      alpha: false,
+      antialias: true,
+      alpha: true,
     });
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      1,
-      10000
-    );
+    const camera = new THREE.PerspectiveCamera(45, 1, 1, 10000);
     const clock = new THREE.Clock();
     const plane = new Plane();
 
@@ -227,33 +216,33 @@ const GLSLHills = ({
     const resize = () => {
       if (!canvasRef.current) return;
 
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
 
-      camera.aspect = w / h;
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      renderer.setSize(w, h, false);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setSize(width, height, false);
     };
 
-    const render = () => {
+    const renderScene = () => {
       plane.render(clock.getDelta());
       renderer.render(scene, camera);
     };
 
-    const renderLoop = () => {
-      render();
-      animationId = window.requestAnimationFrame(renderLoop);
+    const loop = () => {
+      renderScene();
+      animationId = window.requestAnimationFrame(loop);
     };
 
-    renderer.setClearColor(0x000000, 1);
+    renderer.setClearColor(0x000000, 0);
     camera.position.set(0, 16, cameraZ);
     camera.lookAt(new THREE.Vector3(0, 28, 0));
     scene.add(plane.mesh);
 
     resize();
     window.addEventListener("resize", resize);
-    renderLoop();
+    loop();
 
     return () => {
       window.removeEventListener("resize", resize);
@@ -266,25 +255,8 @@ const GLSLHills = ({
   }, [cameraZ, planeSize, speed]);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        position: "relative",
-        width,
-        height,
-        backgroundColor: "#000",
-        overflow: "hidden",
-      }}
-    >
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 1,
-          display: "block",
-        }}
-      />
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      <canvas ref={canvasRef} className="h-full w-full" />
     </div>
   );
 };
